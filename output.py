@@ -26,14 +26,13 @@ def write_fasta(protein_ids, all_proteins,  outfile_location):
     out_file = open(outfile_location,'w')
     out_file.write(subject_str)
     out_file.close()
-def write_result_out(subject_info, outfile_location, all_proteins):
-    out_str = 'miP\tTFs\tmiP domains\tmiP length\n'
+def write_result_out(subject_info, outfile_location, all_proteins): # added 0408 Bo Xue
     written = []
-    for mip in subject_info:
-        if not mip in written:
-            out_str += mip+'\t'+', '.join(subject_info[mip]['query_title'])+'\t'+', '.join(subject_info[mip]['ipr_domains'])+'\t'+str(len(all_proteins[mip]))+'\n'
-        written.append(mip)
-    out_file = open(outfile_location,'w')
-    out_file.write(out_str)
-    out_file.close()
+    #print(subject_info)
+    with open(outfile_location, 'w') as out_file:
+        out_file.write("miP\tTFs\tmiP domains\tmiP length\n")
+        for mip in subject_info:
+            if not mip in written:
+                out_file.write(mip+'\t'+', '.join(subject_info[mip]['query_title'])+'\t'+', '.join(subject_info[mip]['domains'])+'\t'+str(len(all_proteins[mip]))+'\n')
+            written.append(mip)
     print('result written to: '+str(outfile_location))
