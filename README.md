@@ -1,5 +1,11 @@
                         miP3.py Version 2
 
+Example to run
+--------------
+After installing the dependencies (see below) an example can be run with
+
+	python2.7 -p exampleData/TAIR10_pep_20101214_subset -i exampleData/example_tfs.fasta -f exampleData/Pfam.txt -o exampleData/test.tsv -b /path/to/blast/dir/bin/ -s 200 -a 550 -e 0.01 -z 0.5 -x 1
+
 Installation
 -----------
 Unpack the zipped file and install the requirements listed in "Dependencies". After installations of the requirements it can be run from the command line with Python. 
