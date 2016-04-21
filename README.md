@@ -1,4 +1,5 @@
-                        miP3.py Version 2
+miP3.py Version 2
+=================
 
 Example to run
 --------------

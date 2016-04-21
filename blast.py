@@ -41,13 +41,18 @@ def makeBLASTdb(fasta_file, database_name, blast_path):
     Returns:
         Nothing
     """
-    # have to work around windows not being able to run makeblastdb unless it's in the same folder
-    if ' ' in blast_path:
-        try:
-            shutil.copy2(blast_path+'makeblastdb','makeblastdb')
-        except:
-            pass
+    
+    try:
+        # try to run it with location of blast program
+        subprocess.call([blast_path+'/makeblastdb', '-in',  fasta_file, '-dbtype', 'prot', '-out', database_name])
+        return
+    except OSError as e:
+        print(e)
+
+    # else, try to copy it to current folder and run it directly
+    shutil.copy2(blast_path+'makeblastdb','makeblastdb')
     subprocess.call(['./makeblastdb', '-in',  fasta_file, '-dbtype', 'prot', '-out', database_name])
+    return 
 
 def blastp(blast_file, blast_db, evalue, blast_path):
     """
@@ -62,27 +67,25 @@ def blastp(blast_file, blast_db, evalue, blast_path):
     Returns:
         An iterable of blast records as returned by NCBIXML.parse
     """
-    # have to work around windows not being able to run makeblastdb unless it's in the same folder
-    if ' ' in blast_path:
-        try:
-            shutil.copy2(blast_path+'blastp','blastp')
-        except:
-            pass
-    blast_path='copy_folder/'
-    try:
-        shutil.copy2(blast_file, path_leaf(blast_file))
-    except:
-        pass
-    blast_file = path_leaf(blast_file)
+    def cline():
+        blastp_cline()
+        result_handle = open("blastpOutput.xml")
+        blast_records = NCBIXML.parse(result_handle)
+        return blast_records
     print('starting blast, may take a while')
+    try:
+        # try to run it with location of blast program
+        blastp_cline = NcbiblastpCommandline(blast_path+'/blastp', query=blast_file, db=blast_db, evalue=evalue,
+                                                                      outfmt=5, out="blastpOutput.xml")
+        cline()
+    except OSError as e:
+        print(e)
+
+    # else, try to copy it to current folder and run it directly
+    shutil.copy2(blast_path+'blastp','blastp')
     blastp_cline = NcbiblastpCommandline('./blastp', query=blast_file, db=blast_db, evalue=evalue,
                                                                       outfmt=5, out="blastpOutput.xml")
-    blastp_cline()
-    result_handle = open("blastpOutput.xml")
-
-    blast_records = NCBIXML.parse(result_handle)
-    return blast_records
-
+    cline()
 
 def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
     """
@@ -97,33 +100,24 @@ def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
     Returns:
         An iterable of blast records as returned by NCBIXML.parse
     """
-    # because of problems with spaces in path, copy the files to folder without spaces
-    if not os.path.exists('copy_folder'):
-        os.makedirs('copy_folder')
-    if ' ' in blast_path+'rpsblast':
-        try:
-            shutil.copy2(blast_path+'rpsblast','rpsblast')
-        except:
-            pass
-    if ' ' in blast_file:
-        try:
-            shutil.copy2(blast_file+path_leaf(blast_file))
-        except:
-            pass
-        blast_file = path_leaf(blast_file)
-    if ' ' in rpsblast_db:
-        try:
-            shutil.copy2(rpsblast_db,path_leaf(rpsblast_db))
-        except:
-            pass
-        blast_db = path_leaf(rpsblast_db)
+    def cline():
+        rpsblast_cline()
+        result_handle = open("rpsblastOutput.xml")
+        blast_records = NCBIXML.parse(result_handle)
+        return blast_records
     
-    rpsblast_cline = NcbirpsblastCommandline('rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
-    rpsblast_cline()
-    result_handle = open("rpsblastOutput.xml")
+    try:
+        # first try to run it with location of blast program
+        rpsblast_cline = NcbirpsblastCommandline(blast_path+'/rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
+        rpsblast_cline()
+    except OSError as e:
+        print(e)
+        pass
 
-    blast_records = NCBIXML.parse(result_handle)
-    return blast_records
+    # else, try to copy it to current folder and run it directly
+    shutil.copy2(blast_path+'rpsblast','rpsblast')
+    rpsblast_cline = NcbirpsblastCommandline('rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
+    rpsblast_cline() 
 
 def getSubjectInfo(blast_records, prots_of_interest, evalue):
     '''Run through an iterator of blast records and save the results to a dictionary
