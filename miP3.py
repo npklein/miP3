@@ -32,7 +32,7 @@ import sys
 from Bio.Alphabet import IUPAC
 import re
 
-developing = False
+
 
 def validate(seq):
     alphabets = re.compile('^[acdefghiklmnpqrstvwyx]*$', re.I)
@@ -68,6 +68,7 @@ parser.add_argument('-a','--all_size', help='Max size of all proteins to search 
 parser.add_argument('-e','--eval_all', help='E-value limit to use with blast against all proteins',default=0.0000001)
 parser.add_argument('-z','--eval_small', help='E-value limit to use with blast against small proteins',default=0.5)
 parser.add_argument('-x','--eval_reblast', help='E-value limit to use when reblasting small results to find TFs',default=0.1)
+parser.add_argument('-d','--developing', help='When developing flag is set, extra info is printed out', action='store_true' )
 args = vars(parser.parse_args())
 all_proteins_path = args['all_protein_file']
 interest_proteins_path = args['interest_file']
@@ -80,14 +81,16 @@ print 'small size (-s):',args['small_size']
 print 'evalue all (-e):', args['eval_all']
 print 'evalue small (-z):', args['eval_small']
 print 'evalue reblast (-x):', args['eval_reblast']
+print 'developing:', args['developing']
+developing = args['developing']
 if not blast_folder.endswith(os.sep):
         blast_folder+=os.sep
 
 if blast_folder:
-	if _platform == "linux" or _platform == "linux2":
-		blast_folder += './'+blast_folder
+    if _platform == "linux" or _platform == "linux2":
+        blast_folder += './'+blast_folder
 else:
-	blast_folder=''
+    blast_folder=''
 script_path = os.path.realpath(__file__).rstrip(__file__.split('/')[-1])      # find path where miP3 is, so that files can be saved relative to this script
         
 
@@ -166,6 +169,8 @@ if not developing or not os.path.isfile(script_path+'blast_results'+os.sep+'blas
     blast_records = blast.blastp(interest_proteins_path, 'databases'+os.sep+'allDB', args['eval_all'], blast_folder)
     subject_info_allDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_all'])
     if developing:
+        if not os.path.exists(script_path+'blast_results'):
+            os.makedirs(script_path+'blast_results')
         f = open(script_path+'blast_results'+os.sep+'blast_all_'+str(args['eval_all'])+'.p', 'wb' )
         pickle.dump( subject_info_allDB, f )
 print('len subject_info_allDB after < '+str(args['all_size'])+'a.a. Protein blast: '+str(len(subject_info_allDB))+'\n')

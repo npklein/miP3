@@ -33,17 +33,11 @@
 wsdlUrl = 'http://www.ebi.ac.uk/Tools/services/soap/iprscan5?wsdl'
 
 # Load libraries
-import base64, platform, os, SOAPpy, sys, time
-import warnings
+import base64, platform, os, SOAPpy, time
 from SOAPpy import WSDL
-from optparse import OptionParser
 import urllib2
 import xml.parsers.expat
-import xml.etree.ElementTree as ElementTree
-import cStringIO
 import sys
-import socket
-import traceback
 class InterproScan():
     """Identify protein family, domain and signal signatures in a 
        protein sequence using InterProScan. For more information on InterProScan 
@@ -296,11 +290,11 @@ class InterproScan():
         return result['type']
 
     # Get result
-    def serviceGetResult(self, jobId, type):
+    def serviceGetResult(self, jobId, service_type):
         self.printDebugMessage('serviceGetResult', 'Begin', 1)
         self.printDebugMessage('serviceGetResult', 'jobId: ' + jobId, 1)
-        self.printDebugMessage('serviceGetResult', 'type: ' + type, 1)
-        self.resultBase64 = self.server.getResult(jobId=jobId, type=type)
+        self.printDebugMessage('serviceGetResult', 'type: ' + service_type, 1)
+        self.resultBase64 = self.server.getResult(jobId=jobId, type=service_type)
         result = base64.decodestring(self.resultBase64)
         self.printDebugMessage('serviceGetResult', 'End', 1)
         return result
@@ -363,7 +357,7 @@ class InterproScan():
     # Output available result types for job.
     def printGetResultTypes(self, jobId):
         self.printDebugMessage('printGetResultTypes', 'Begin', 1)
-        for resultType in serviceGetResultTypes(jobId):
+        for resultType in self.serviceGetResultTypes(jobId):
             print resultType['identifier']
             if(hasattr(resultType, 'label')):
                 print "\t", resultType['label']
@@ -388,9 +382,9 @@ def runInterpro(sequence_list):
     while internet_error:                               # need to keep trying InterproScan until it finishes without error, because of a rare error that can happen for a reason I don't know (xml from InterPro scan not well formed)
         # check if there is an internet connecion
         try:
-            response=urllib2.urlopen('http://google.com',timeout=1) # http://74.125.113.99 is googles ip
+            urllib2.urlopen('http://google.com',timeout=1) # http://74.125.113.99 is googles ip
             internet_error = False
-        except (urllib2.URLError, urllib2.HTTPError) as err: 
+        except (urllib2.URLError, urllib2.HTTPError): 
             sys.stderr.write('No internet\n')
             # wait 10 seconds * loop_count, so that if the error is thrown quickly it doesn't try too often then try again
             sys.stderr.write('Trying again after:10 seconds\n')
