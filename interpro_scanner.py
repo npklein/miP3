@@ -17,11 +17,8 @@
 
 import iprscan_soappy
 import re
-import socket
 import pickle
 import os.path
-import time
-import os
 import traceback
 developing = False
 def interpro_result(interpro_submit_sequences):
@@ -41,7 +38,8 @@ def interpro_result(interpro_submit_sequences):
         protein_ipr_db_domain[protein_name]['ipr_domain_names'] = ipr_domain_names
         if developing:
             try:
-                f = open( os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p', 'wb' )
+                interpro_data = os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
+                f = open( interpro_data, 'wb' )
                 pickle.dump( protein_ipr_db_domain[protein_name], f )
                 print 'wrote interpro data to '+interpro_data
             except:
@@ -72,9 +70,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file):
 
     interpro_submit_sequences = []	# submit 15 asynchronyous jobs from this list
     length_of_sequence_list = len(fasta_sequences)								 # needed to update the statusbar a little bit per sequence
-    try:
-        added_statusbar_per_sequence = float(70)/float(length_of_sequence_list)	  # the length added per sequence. Calculated here so it doesn't have to be calculated every loop
-    except ZeroDivisionError:
+    if length_of_sequence_list == 0:	  # the length added per sequence. 
         print('Nothing found','No putative mip found, exiting program')								 # tell about the error
     x=1
     protein_ipr_db_domain = {}
@@ -83,7 +79,6 @@ def interproScan(subject_info, all_proteins,pfam_domains_file):
         x+=1
         sequence_count += 1
         protein_name = (fasta_sequence.split('\n')[0].lstrip('>'))					 # get the protein name
-        toprint = False
         try:
             if not os.path.exists('interpro_results'):
                 os.makedirs('interpro_results')

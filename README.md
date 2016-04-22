@@ -5,7 +5,7 @@ Example to run
 --------------
 After installing the dependencies (see below) an example can be run with
 
-	python2.7 -p exampleData/TAIR10_pep_20101214_subset -i exampleData/example_tfs.fasta -f exampleData/Pfam.txt -o exampleData/test.tsv -b /path/to/blast/dir/bin/ -s 200 -a 550 -e 0.01 -z 0.5 -x 1
+	python2.7 miP3.py -p exampleData/TAIR10_pep_20101214_subset -i exampleData/example_tfs.fasta -f exampleData/Pfam.txt -o exampleData/test.tsv -b /path/to/blast/dir/bin/ -s 200 -a 550 -e 0.01 -z 0.5 -x 1
 
 Installation
 -----------
@@ -33,7 +33,9 @@ Internet connection
 Python 2.7.x - obtainable from http://www.python.org/download/releases/2.7/ 
 Biopython - obtainable from http://biopython.org/wiki/Download 
 BLAST+ - obtainable from
-ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/. Version 2.2.29 is the version the program was tested with. For the latest version of BLAST go to ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/. NOTE: The BLAST+ program does not work when there are spaces in the filepath (e.g. if it is installed in C:\Program Files\ it will not work).
+ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/. Version 2.2.29 is the version the program was tested with. For the latest version of BLAST go to ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/. 
+IMPORTANT: With version 2.2.31 the fasta titles can not contain more than 1 subsequent whitespace as BLAST will strip these and then they do not match anymore. 
+IMPORTANT: The BLAST+ program does not work when there are spaces in the filepath (e.g. if it is installed in C:\Program Files\ it will not work).
 SOAPpy - Read download instructions from http://www.aheil.de/2013/08/17/soap-with-python/
 
 
@@ -102,5 +104,5 @@ Changes:
 - Domains to use as filter can now be IPR IDs instead of domain names 
 - Code is reorganized and cleaned up 
 
-1. Magnani, Enrico, Niek de Klein, Hye-In Nam, Jung-Gun Kim, Kimberly Pham, Elisa Fiume, Mary Beth Mudgett, and Seung Yon Rhee. "A comprehensive analysis of microProteins reveals their potentially widespread mechanism of transcriptional regulation." Plant Physiology (2014): pp-114.
+1. De Klein, Niek, Enrico Magnani, Michael Banf, and Seung Yon Rhee. "Microprotein prediction program (miP3): a software for predicting microproteins and their target transcription factors." International journal of genomics 2015 (2015).
 

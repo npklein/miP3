@@ -20,7 +20,6 @@ from Bio.Blast.Applications import NcbiblastpCommandline
 from Bio.Blast.Applications import NcbirpsblastCommandline
 from Bio.Blast import NCBIXML
 import re
-import os
 import subprocess
 import ntpath
 
@@ -67,7 +66,7 @@ def blastp(blast_file, blast_db, evalue, blast_path):
     Returns:
         An iterable of blast records as returned by NCBIXML.parse
     """
-    def cline():
+    def cline(blastp_cline):
         blastp_cline()
         result_handle = open("blastpOutput.xml")
         blast_records = NCBIXML.parse(result_handle)
@@ -77,7 +76,7 @@ def blastp(blast_file, blast_db, evalue, blast_path):
         # try to run it with location of blast program
         blastp_cline = NcbiblastpCommandline(blast_path+'/blastp', query=blast_file, db=blast_db, evalue=evalue,
                                                                       outfmt=5, out="blastpOutput.xml")
-        return cline()
+        return cline(blastp_cline)
     except OSError as e:
         print(e)
 
@@ -85,7 +84,7 @@ def blastp(blast_file, blast_db, evalue, blast_path):
     shutil.copy2(blast_path+'blastp','blastp')
     blastp_cline = NcbiblastpCommandline('./blastp', query=blast_file, db=blast_db, evalue=evalue,
                                                                       outfmt=5, out="blastpOutput.xml")
-    return cline()
+    return cline(blastp_cline)
 
 def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
     """
@@ -101,7 +100,7 @@ def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
         An iterable of blast records as returned by NCBIXML.parse
     """
     def cline():
-        rpsblast_cline()
+        rpsblast_cline(rpsblast_cline)
         result_handle = open("rpsblastOutput.xml")
         blast_records = NCBIXML.parse(result_handle)
         return blast_records
@@ -109,7 +108,7 @@ def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
     try:
         # first try to run it with location of blast program
         rpsblast_cline = NcbirpsblastCommandline(blast_path+'/rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
-        return rpsblast_cline()
+        return rpsblast_cline(rpsblast_cline)
     except OSError as e:
         print(e)
         pass
@@ -117,7 +116,7 @@ def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
     # else, try to copy it to current folder and run it directly
     shutil.copy2(blast_path+'rpsblast','rpsblast')
     rpsblast_cline = NcbirpsblastCommandline('rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
-    return rpsblast_cline() 
+    return rpsblast_cline(rpsblast_cline) 
 
 def getSubjectInfo(blast_records, prots_of_interest, evalue):
     '''Run through an iterator of blast records and save the results to a dictionary
@@ -141,14 +140,9 @@ def getSubjectInfo(blast_records, prots_of_interest, evalue):
             # for some reason makeblastdb can put BL_ORD_id in front of the actual description
             if re.match('\Agnl\|BL_ORD_ID\|\d+\s',subj_title) > 0:
                 subj_title = re.split('\Agnl\|BL_ORD_ID\|\d+\s',subj_title)[1]
-            isInterest = False
             for hsp in alignment.hsps:
-                # check if the protein is not a protein of interest (the ones used for query) and evalue of blast lower than given evalue
-#                if 'zpr' in subj_title.lower():
-#                    print subj_title, hsp.expect,evalue, float(hsp.expect) <= float(evalue)
-                if float(hsp.expect) <= float(evalue):
-#                    if 'zpr' in subj_title.lower():
-#                        print 'got added to subject_info'
+                # check if evalue of blast lower than given evalue and query is not exact match with subject
+                if float(hsp.expect) <= float(evalue) and query != subj_title:
                     #saving all unique genes and their info from tair db
                     if subject_info.has_key(subj_title):
                         subject_info[subj_title]['hsp'].append(hsp)

@@ -14,11 +14,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with miP3.py.  If not, see <http://www.gnu.org/licenses/>.")
-developing = False
-def validate(seq, alphabet='ACDEFGHIKLMNPQRSTVWY'):
-    "Checks that a sequence only contains values from an alphabet"
-    leftover = set(seq.upper()) - set(alphabet)
-    return not leftover
+
+
 
 
 import timing
@@ -26,17 +23,16 @@ import os
 # imports from predictmiP
 import argparse
 import blast
-import domains
 import interpro_scanner
 import output
 from Bio import SeqIO
 from sys import platform as _platform
 import pickle
 import sys
-import time
 from Bio.Alphabet import IUPAC
 import re
 
+developing = False
 
 def validate(seq):
     alphabets = re.compile('^[acdefghiklmnpqrstvwyx]*$', re.I)
@@ -262,12 +258,17 @@ del(subject_info_allDB)
 del(subject_info_smallDB)
 
 # check if mip is not longer than its transcription factor+10%
+# and remove TFs that are exact match with the miP
 subject_info_filtered_on_compared_length = {}
 mip_longer = False
 for subject in subject_info_total:
     for query in subject_info_total[subject]['query_title']:
         query_length = len(all_proteins[query])
-        if len(all_proteins[subject]) <  query_length + (float(query_length)/10):
+        if all_proteins[subject] == all_proteins[query]:
+            # skip if it is exact match with miP
+            continue
+        # don't add miP if it has no results beacuase of this
+        elif len(all_proteins[subject]) <  query_length + (float(query_length)/10):
             subject_info_filtered_on_compared_length[subject] = subject_info_total[subject]
 if developing:
     for subject in subject_info_filtered_on_compared_length:
