@@ -21,9 +21,9 @@ import pickle
 import os.path
 import traceback
 developing = False
-def interpro_result(interpro_submit_sequences):
+def interpro_result(interpro_submit_sequences, email):
     protein_ipr_db_domain = {}
-    for protein_name, interpro_result in iprscan_soappy.runInterpro(interpro_submit_sequences):					# get dict with as value protein name and as value various stuff
+    for protein_name, interpro_result in iprscan_soappy.runInterpro(interpro_submit_sequences, email):					# get dict with as value protein name and as value various stuff
         ipr_domain_names = []
         protein_ipr_db_domain[protein_name] = {}
 
@@ -48,13 +48,14 @@ def interpro_result(interpro_submit_sequences):
     
     return protein_ipr_db_domain
 
-def interproScan(subject_info, all_proteins,pfam_domains_file):
+def interproScan(subject_info, all_proteins,pfam_domains_file, email):
     '''Scans all the proteins in protein_list with InterproScan. Remove subjects from subject_info that have a domain that is now allowed (as given by user, e.g. transcription factor domains)
         or that don't have any IPR domains in comon with any of its query proteins.
         
         Args:
         subject_info (dict):	   Dict with as key name of subject (found) protein and as one of the values the name of the query (searched) protein(s)
         all_proteins (dict):	   Dict that contains as key protein name and as value the sequence of that protein
+        email (string):            email adres that will be send to interproscan
         
         Returns:
         Dict that is subject_info but filtered on subjects from subject_info that have a domain that is now allowed (as given by user, e.g. transcription factor domains)
@@ -102,7 +103,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file):
             protein_ipr_db_domain[protein_name] = {}									# keep the ipr codes and database name and domain name in this dict
             interpro_submit_sequences.append(fasta_sequence)
             if sequence_count % 25 == 0 or len(fasta_sequences) <= sequence_count-1:	  # divivide it up into chunks of 25
-                result = interpro_result(interpro_submit_sequences)
+                result = interpro_result(interpro_submit_sequences,email)
                 protein_ipr_db_domain.update(result)
                 interpro_submit_sequences = []
     # if for some reason not all of them were done
@@ -121,7 +122,6 @@ def interproScan(subject_info, all_proteins,pfam_domains_file):
         # filter on unwanted pfam domains again, even if it was done before, because server is most up to date. Previous pfam filter was to
         # pre-eliminate proteins so less have to go through interproscan.
         if subject not in protein_ipr_db_domain:
-            protein_domains[subject]
 #            try:
             print('missed getting interpro file for',subject, ', searchin interpro now')
             result = interpro_result(['>'+subject+'\n'+str(all_proteins[subject])])

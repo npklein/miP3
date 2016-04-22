@@ -29,7 +29,6 @@ from Bio import SeqIO
 from sys import platform as _platform
 import pickle
 import sys
-from Bio.Alphabet import IUPAC
 import re
 
 
@@ -69,6 +68,7 @@ parser.add_argument('-e','--eval_all', help='E-value limit to use with blast aga
 parser.add_argument('-z','--eval_small', help='E-value limit to use with blast against small proteins',default=0.5)
 parser.add_argument('-x','--eval_reblast', help='E-value limit to use when reblasting small results to find TFs',default=0.1)
 parser.add_argument('-d','--developing', help='When developing flag is set, extra info is printed out and it uses the blast result from previous run.', action='store_true' )
+parser.add_argument('-m','--email', help='Email is necessary for InterproScan webservice', required=True)
 args = vars(parser.parse_args())
 all_proteins_path = args['all_protein_file']
 interest_proteins_path = args['interest_file']
@@ -81,6 +81,7 @@ print 'small size (-s):',args['small_size']
 print 'evalue all (-e):', args['eval_all']
 print 'evalue small (-z):', args['eval_small']
 print 'evalue reblast (-x):', args['eval_reblast']
+print 'email (-m):', args['email']
 print 'developing:', args['developing']
 developing = args['developing']
 if not blast_folder.endswith(os.sep):
@@ -155,8 +156,8 @@ output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fast
 if not os.path.exists('databases'):
     os.makedirs('databases')
 
+blast_all_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_all_'+str(args['eval_all'])+'.p'
 if developing:
-    blast_all_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_all_'+str(args['eval_all'])+'.p'
     if os.path.isfile(blast_all_pickle):
         print 'BLAST records with this e-value against ALL database already exists, loading: '+script_path+'blast_results'+os.sep+'blast_all_'+str(args['eval_all'])+'.p'
         try:
@@ -187,8 +188,8 @@ if developing:
 
 # small proteins. First BLAST against small proteins database so that the subject_info_all can be used to BLAST subjects against all proteins and check if hits  protein of interest
 # BLAST against small proteins
+blast_small_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_small_'+str(args['eval_small'])+'.p'
 if developing:
-    blast_small_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_small_'+str(args['eval_small'])+'.p'
     if os.path.isfile(blast_small_pickle):
         print 'BLAST records with this e-value against SMALL database already exists, loading: '+script_path+'blast_results'+os.sep+'blast_all_'+str(args['eval_small'])+'.p'
         try:
@@ -291,7 +292,7 @@ print('len subject_info_filtered_on_compared_length after filtering on comparati
 ###### try uncommenting this line and adding 'import pfam' at the top of the file (check out pfam.py before)
 #subject_info_filter_on_pfam = pfam.pfamSearch(subject_info_filtered_on_compared_length, all_proteins)
 ########################################################################################
-subject_info_filtered_on_domains = interpro_scanner.interproScan(subject_info_filtered_on_compared_length, all_proteins,pfam_domains_file_path)  # filter on domain information gained from interproscan
+subject_info_filtered_on_domains = interpro_scanner.interproScan(subject_info_filtered_on_compared_length, all_proteins,pfam_domains_file_path, args['email'])  # filter on domain information gained from interproscan
 if developing:
     for subject in subject_info_filtered_on_domains:
         for prot in not_found:

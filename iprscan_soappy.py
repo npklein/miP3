@@ -369,11 +369,12 @@ class InterproScan():
                 print "\t", resultType['fileSuffix']
         self.printDebugMessage('printGetResultTypes', 'End', 1)
 
-def runInterpro(sequence_list):
+def runInterpro(sequence_list, email):
     '''Runs one sequence through interproscan, and returns the result
     
        Args:
            sequences (str):    Fasta representation of a list of sequences
+           email (string):            email adres that will be send to interproscan
            
        Returns:
            Dictionary with as key sequence name and as value a dictionary with IPR id and value a dictionary with as key dbname and as value protein name
@@ -392,7 +393,7 @@ def runInterpro(sequence_list):
     interpro_scan_error = True
     while interpro_scan_error:
         try:
-            interproscan = InterproScan(sequences = sequence_list, email='me_niek@hotmail.com',  # run interpro scan with one sequence (has to be fasta format). Don't
+            interproscan = InterproScan(sequences = sequence_list, email=email,  # run interpro scan with one sequence (has to be fasta format). Don't
                                                                verbose = True, write_outfiles = False, quiet = False, debugLevel = 1)     # write out any of the results, because it gets parsed directly
             interpro_scan_error = False
         except AttributeError as e:

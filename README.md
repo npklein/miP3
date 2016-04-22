@@ -1,6 +1,8 @@
 miP3.py Version 2
 =================
 
+This is an updated version of miP3.py at https://dpb.carnegiescience.edu/labs/rhee-lab/software. 
+
 Example to run
 --------------
 After installing the dependencies (see below) an example can be run with
@@ -104,5 +106,8 @@ Changes:
 - Domains to use as filter can now be IPR IDs instead of domain names 
 - Code is reorganized and cleaned up 
 
-1. De Klein, Niek, Enrico Magnani, Michael Banf, and Seung Yon Rhee. "Microprotein prediction program (miP3): a software for predicting microproteins and their target transcription factors." International journal of genomics 2015 (2015).
+
+Cite
+----
+De Klein, Niek, Enrico Magnani, Michael Banf, and Seung Yon Rhee. "Microprotein prediction program (miP3): a software for predicting microproteins and their target transcription factors." International journal of genomics 2015 (2015).
 
