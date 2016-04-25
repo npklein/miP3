@@ -166,11 +166,12 @@ if developing:
             os.remove(blast_all_pickle)
 ###### use if not instead of else incase the error above got thrown, and file got removed
 if not developing or not os.path.isfile(blast_all_pickle):
+    print 'blasting against all'
     blast.makeBLASTdb('fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta', 'databases'+os.sep+'allDB', blast_folder)       # make all proteins database
-    print 'blasting against all, saving in '+blast_all_pickle
     blast_records = blast.blastp(interest_proteins_path, 'databases'+os.sep+'allDB', args['eval_all'], blast_folder)
     subject_info_allDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_all'])
     if developing:
+        print 'saving in '+blast_all_pickle
         if not os.path.exists(script_path+'blast_results'):
             os.makedirs(script_path+'blast_results')
         f = open(blast_all_pickle, 'wb' )
@@ -198,10 +199,11 @@ if developing:
             os.remove(blast_small_pickle)
 if not developing or not os.path.isfile(blast_small_pickle):
     blast.makeBLASTdb('fasta_files'+os.sep+'small_proteins.fasta', 'databases'+os.sep+'smallDB', blast_folder)       # make all proteins database
-    print 'blasting against small, saving in '+blast_small_pickle
+    print 'blasting against small' 
     blast_records = blast.blastp(interest_proteins_path, 'databases'+os.sep+'smallDB', args['eval_small'], blast_folder)
     subject_info_smallDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_small'])
     if developing:
+        print 'saving in '+blast_small_pickle
         f = open(blast_small_pickle, 'wb' )
         pickle.dump( subject_info_smallDB, f )
 # Update dictionary with key found proteins, value queries proteins

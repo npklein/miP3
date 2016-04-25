@@ -219,8 +219,10 @@ class InterproScan():
                 jobid_new = None
         # Get job status
         elif status and jobid:
+            sys.stderr.write('Checking status')
             status = self.serviceCheckStatus(jobid)
             sys.stderr.write(str(status)+'\n')
+            time.sleep(5)
         # List result types for job
         elif resultTypes and jobid:
             self.printGetResultTypes(jobid)
@@ -279,7 +281,12 @@ class InterproScan():
     # Get job status
     def serviceCheckStatus(self, jobId):
         self.printDebugMessage('serviceCheckStatus', 'jobId: ' + jobId, 1)
-        result = self.server.getStatus(jobId = jobId)
+        try:
+            result = self.server.getStatus(jobId = jobId)
+        except:
+            print('sleeping 30 seconds before checking status again...')
+            time.sleep(30)
+            result = self.server.getStatus(jobId = jobId)
         return result
 
     # Get available result types for job
@@ -304,10 +311,11 @@ class InterproScan():
         self.printDebugMessage('clientPoll', 'Begin', 1)
         result = 'PENDING'
         while result == 'RUNNING' or result == 'PENDING':
+            sys.stderr.write('Checking status')
             result = self.serviceCheckStatus(jobId)
             print >>sys.stderr, result
             if result == 'RUNNING' or result == 'PENDING':
-                time.sleep(15)
+                time.sleep(30)
         self.printDebugMessage('clientPoll', 'End', 1)
 
     # Get result for a jobid

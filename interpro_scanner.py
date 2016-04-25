@@ -23,6 +23,7 @@ import traceback
 developing = False
 def interpro_result(interpro_submit_sequences, email):
     protein_ipr_db_domain = {}
+    # this is done per 25
     for protein_name, interpro_result in iprscan_soappy.runInterpro(interpro_submit_sequences, email):					# get dict with as value protein name and as value various stuff
         ipr_domain_names = []
         protein_ipr_db_domain[protein_name] = {}
@@ -30,7 +31,6 @@ def interpro_result(interpro_submit_sequences, email):
         for ipr_code in interpro_result:
             # list of ipr domain names for this protein
             if 'ipr_names' in interpro_result[ipr_code]:
-                print(interpro_result[ipr_code]['ipr_names'])
                 ipr_domain_names += interpro_result[ipr_code]['ipr_names']
             for database in interpro_result[ipr_code]:
                 protein_ipr_db_domain[protein_name][ipr_code] = {database:interpro_result[ipr_code][database]}	 # update it with database and database specific name
@@ -80,36 +80,34 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
         x+=1
         sequence_count += 1
         protein_name = (fasta_sequence.split('\n')[0].lstrip('>'))					 # get the protein name
-        try:
-            if not os.path.exists('interpro_results'):
-                os.makedirs('interpro_results')
-            interpro_file = os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
-        except:
-            pass
-#        try:
+        if not os.path.exists('interpro_results'):
+            os.makedirs('interpro_results')
+        interpro_file = os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
+
         if developing:
             if os.path.isfile(interpro_file):
                 try:
                     interpro_data = pickle.load( open(interpro_file, 'rb' ) )
                     protein_ipr_db_domain[protein_name] = interpro_data
-    #                print 'loaded interpro data from '+str(interpro_file)
-
+                    print 'loaded interpro data from '+str(interpro_file)
                 except EOFError:
+                    # if file is not read correctly, remove it so that it is remade
                     os.remove(interpro_file)
-#        except:
-#            pass
         if not os.path.isfile(interpro_file):
             # simple counter
             protein_ipr_db_domain[protein_name] = {}									# keep the ipr codes and database name and domain name in this dict
             interpro_submit_sequences.append(fasta_sequence)
             if sequence_count % 25 == 0 or len(fasta_sequences) <= sequence_count-1:	  # divivide it up into chunks of 25
-                result = interpro_result(interpro_submit_sequences,email)
-                protein_ipr_db_domain.update(result)
+                interpro_data = interpro_result(interpro_submit_sequences,email)
+                protein_ipr_db_domain.update(interpro_data)
                 interpro_submit_sequences = []
+                f = open(interpro_file, 'wb' )
+                pickle.dump( interpro_data, f )
+                print 'written interpro data to '+str(interpro_file)
     # if for some reason not all of them were done
     if len(interpro_submit_sequences) > 0:
-        result = interpro_result(interpro_submit_sequences)
-        protein_ipr_db_domain.update(result)
+        interpro_data = interpro_result(interpro_submit_sequences)
+        protein_ipr_db_domain.update(interpro_data)
 
 #### remove subjects with a pfam domain or IPR code that's not allowed and subjects that don't have any domains in common with their query protein(s)
     subject_info_filtered_on_domains = {}											# First, remove the proteins that have a Pfam domain that's not allowed and sve in this dict
