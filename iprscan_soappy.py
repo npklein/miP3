@@ -311,10 +311,11 @@ class InterproScan():
         self.printDebugMessage('clientPoll', 'Begin', 1)
         result = 'PENDING'
         while result == 'RUNNING' or result == 'PENDING':
-            sys.stderr.write('Checking status')
+            sys.stderr.write('Checking status\n')
             result = self.serviceCheckStatus(jobId)
             print >>sys.stderr, result
             if result == 'RUNNING' or result == 'PENDING':
+                print('sleeping 30 seconds before checking status again...')
                 time.sleep(30)
         self.printDebugMessage('clientPoll', 'End', 1)
 

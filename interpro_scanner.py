@@ -83,7 +83,6 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
         if not os.path.exists('interpro_results'):
             os.makedirs('interpro_results')
         interpro_file = os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
-
         if developing:
             if os.path.isfile(interpro_file):
                 try:
@@ -106,7 +105,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
                 print 'written interpro data to '+str(interpro_file)
     # if for some reason not all of them were done
     if len(interpro_submit_sequences) > 0:
-        interpro_data = interpro_result(interpro_submit_sequences)
+        interpro_data = interpro_result(interpro_submit_sequences, email)
         protein_ipr_db_domain.update(interpro_data)
 
 #### remove subjects with a pfam domain or IPR code that's not allowed and subjects that don't have any domains in common with their query protein(s)

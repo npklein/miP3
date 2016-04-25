@@ -137,6 +137,7 @@ for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
         print seq_record.description
         print seq
         sys.exit()
+    print(seq_record.description)
     all_proteins[seq_record.description] = seq
     proteins_of_interest[seq_record.description] = seq_record.seq
     if len(seq_record.seq) <= int(args['small_size']):
@@ -159,7 +160,7 @@ if not os.path.exists('databases'):
 blast_all_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_all_'+str(args['eval_all'])+'.p'
 if developing:
     if os.path.isfile(blast_all_pickle):
-        print 'BLAST records with this e-value against ALL database already exists, loading: '+script_path+'blast_results'+os.sep+'blast_all_'+str(args['eval_all'])+'.p'
+        print 'BLAST records with this e-value against ALL database already exists, loading: '+blast_all_pickle
         try:
             subject_info_allDB = pickle.load( open(blast_all_pickle, 'rb' ))
         except EOFError:
@@ -178,21 +179,21 @@ if not developing or not os.path.isfile(blast_all_pickle):
         pickle.dump( subject_info_allDB, f )
 print('len subject_info_allDB after < '+str(args['all_size'])+'a.a. Protein blast: '+str(len(subject_info_allDB))+'\n')
 
-if developing:
-    for subject in subject_info_allDB:                                                          # Loop over all
+#if developing:
+#    for subject in subject_info_allDB:                                                          # Loop over all
     #    print subject_info_allDB[subject]['query_title']
-        for prot in not_found:
-            if prot.lower() in subject.lower():
-                print('found in allDb')
-                print(subject)
-                print('-'*20)
+#        for prot in not_found:
+#            if prot.lower() in subject.lower():
+#                print('found in allDb')
+#                print(subject)
+#                print('-'*20)
 
 # small proteins. First BLAST against small proteins database so that the subject_info_all can be used to BLAST subjects against all proteins and check if hits  protein of interest
 # BLAST against small proteins
 blast_small_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_small_'+str(args['eval_small'])+'.p'
 if developing:
     if os.path.isfile(blast_small_pickle):
-        print 'BLAST records with this e-value against SMALL database already exists, loading: '+script_path+'blast_results'+os.sep+'blast_all_'+str(args['eval_small'])+'.p'
+        print 'BLAST records with this e-value against SMALL database already exists, loading: '+blast_small_pickle
         try:
             subject_info_smallDB = pickle.load( open(blast_small_pickle, 'rb' ))
         except EOFError:
@@ -208,15 +209,15 @@ if not developing or not os.path.isfile(blast_small_pickle):
         pickle.dump( subject_info_smallDB, f )
 # Update dictionary with key found proteins, value queries proteins
 
-if developing:
-    for subject in subject_info_smallDB:
+#if developing:
+#    for subject in subject_info_smallDB:
     #    if 'zpr' in subject.lower():
     #        print 'subject_info_smallDB'
     #        print subject
-        for prot in not_found:
-            if prot.lower() in subject.lower():
-                print('found in smallDb')
-                print(subject)
+#        for prot in not_found:
+#            if prot.lower() in subject.lower():
+#                print('found in smallDb')
+#                print(subject)
 print('len subject_info_smallDB after smallBLAST: '+str(len(subject_info_smallDB))+'\n')                     # just a print >>
 
 # check if there were subjects found with small blast
@@ -226,20 +227,21 @@ if len(subject_info_smallDB) > 0:
 
 # check if, when subjects are blast against alldb, they have hit with protein of interest. If they do, they are put into subject_info_all
 # miPs that were known at that moment  (this might be redundant and takes extra time. Can possibly be taken out, but test if you get the same results
+reblast_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'reblast'+str(args['eval_all'])+'.p'
 if developing:
-    if os.path.isfile(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'):
-        print 'BLAST records with this e-value against SMALL database and e-value for REBLAST against ALL database already exists, loading: '+script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'
+    if os.path.isfile(reblast_pickle):
+        print 'BLAST records with this e-value against SMALL database and e-value for REBLAST against ALL database already exists, loading: '+reblast_pickle
         try:
-            subject_info_smallDB_filtered_reblast = pickle.load( open(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p', 'rb' ))
+            subject_info_smallDB_filtered_reblast = pickle.load( open(reblast_pickle, 'rb' ))
         except EOFError:
-            os.remove(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p')
+            os.remove(reblast_pickle)
 if not developing or not os.path.isfile(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'):
     print 'reblasting, saving in '+script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'
     blast.makeBLASTdb('fasta_files'+os.sep+'proteins_of_interest.fasta', 'databases'+os.sep+'allDB_for_reblast', blast_folder)       # make all proteins database
     blast_records = blast.blastp('fasta_files'+os.sep+'subjects_from_small.fasta', 'databases'+os.sep+'allDB_for_reblast', args['eval_reblast'], blast_folder)   # BLAST against interest
     subject_info_smallDB_filtered_reblast = blast.subjectHitsInterest(blast_records, proteins_of_interest, args['eval_reblast'])             # Check if protein found in prev. BLAST is a TF, if so, keep the subject from first BLAST
     if developing:
-        f = open(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p', 'wb' )
+        f = open(reblast_pickle, 'wb' )
         pickle.dump( subject_info_smallDB_filtered_reblast, f )
 
 if developing:
