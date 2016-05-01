@@ -20,6 +20,8 @@ import re
 import pickle
 import os.path
 import traceback
+import SOAPpy
+import time
 developing = False
 def interpro_result(interpro_submit_sequences, email):
     protein_ipr_db_domain = {}
@@ -97,7 +99,20 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
             protein_ipr_db_domain[protein_name] = {}									# keep the ipr codes and database name and domain name in this dict
             interpro_submit_sequences.append(fasta_sequence)
             if sequence_count % 25 == 0 or len(fasta_sequences) <= sequence_count-1:	  # divivide it up into chunks of 25
-                interpro_data = interpro_result(interpro_submit_sequences,email)
+                x = 0
+                while True:
+                    try:
+                        interpro_data = interpro_result(interpro_submit_sequences,email)
+                        break
+                    except SOAPpy.Errors.HTTPError:
+                        x+=1
+                        if x == 100:
+                            print('failed 100 times, something wrong with interpro server')
+                            raise
+                        print 'HTTPError, sleep 1 minute to give running jobs time to finish, then submitting same jobs again'
+                        print 'try '+str(x)+'/100'
+                        time.sleep(60)
+                        
                 protein_ipr_db_domain.update(interpro_data)
                 interpro_submit_sequences = []
                 f = open(interpro_file, 'wb' )
@@ -120,8 +135,18 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
         # pre-eliminate proteins so less have to go through interproscan.
         if subject not in protein_ipr_db_domain:
 #            try:
-            print('missed getting interpro file for',subject, ', searchin interpro now')
-            result = interpro_result(['>'+subject+'\n'+str(all_proteins[subject])])
+            print('missed getting interpro file for',subject, ', searching interpro now')
+            x = 0
+            while True:
+                try:
+                    result = interpro_result(['>'+subject+'\n'+str(all_proteins[subject])])
+                except SOAPpy.Errors.HTTPError:
+                    x+=1
+                    if x == 100:
+                        print('failed 100 times, something wrong with interpro server')
+                        raise
+                    print 'HTTPError, sleep 1 minute to give running jobs time to finish, then submitting same jobs again'
+                    time.sleep(60)
             protein_ipr_db_domain.update(result)
 #            except:
 #                print subject, 'could not be processed'

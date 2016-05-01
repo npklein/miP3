@@ -67,7 +67,8 @@ The mandatory arguments are:
     -i: A fasta file containing proteins of interest 
     -f: Text file with unwanted Pfam domains 
     -o: The output file name 
-    -b  Folder that contains makeblastd, blastp and rpsblast
+    -b: Folder that contains makeblastd, blastp and rpsblast
+    -e: Valid e-mail adres that is send to InterproScan server
 
 And the optional arguments are:
 
