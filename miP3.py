@@ -149,7 +149,7 @@ output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fast
 
 if not os.path.exists(script_path+'databases'):
     os.makedirs(script_path+'databases')
-if not os.path.exists(script_path+'databases'):
+if not os.path.exists(script_path+'blast_results'):
     os.makedirs(script_path+'blast_results')
 blast_all_pickle = script_path+'blast_results'+os.sep+organism_name+'_blast_all_'+str(args['eval_all'])+'.p'
 if developing:
