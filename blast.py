@@ -67,9 +67,9 @@ def blastp(blast_file, blast_db, evalue, blast_path, blastoutput_xml):
     Returns:
         An iterable of blast records as returned by NCBIXML.parse
     """
-    def cline(blastp_cline):
+    def cline(blastp_cline, blastoutput_xml):
         blastp_cline()
-        result_handle = open("blastpOutput.xml")
+        result_handle = open(blastoutput_xml)
         blast_records = NCBIXML.parse(result_handle)
         return blast_records
     print('starting blast, may take a while')
@@ -77,7 +77,7 @@ def blastp(blast_file, blast_db, evalue, blast_path, blastoutput_xml):
         # try to run it with location of blast program
         blastp_cline = NcbiblastpCommandline(blast_path+'/blastp', query=blast_file, db=blast_db, evalue=evalue,
                                                                       outfmt=5, out=blastoutput_xml)
-        return cline(blastp_cline)
+        return cline(blastp_cline, blastoutput_xml)
     except OSError as e:
         print(e)
 
