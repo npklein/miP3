@@ -89,7 +89,7 @@ if not blast_folder.endswith(os.sep):
 
 if blast_folder:
     if _platform == "linux" or _platform == "linux2":
-        blast_folder += './'+blast_folder
+        blast_folder = './'+blast_folder
 else:
     blast_folder=''
 script_path = os.path.realpath(__file__).rstrip(__file__.split('/')[-1])      # find path where miP3 is, so that files can be saved relative to this script
