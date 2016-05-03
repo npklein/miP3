@@ -22,8 +22,8 @@ import os.path
 import traceback
 import SOAPpy
 import time
-developing = False
-def interpro_result(interpro_submit_sequences, email):
+
+def interpro_result(interpro_submit_sequences, email, developing):
     protein_ipr_db_domain = {}
     # this is done per 25
     for protein_name, interpro_result in iprscan_soappy.runInterpro(interpro_submit_sequences, email):					# get dict with as value protein name and as value various stuff
@@ -47,10 +47,9 @@ def interpro_result(interpro_submit_sequences, email):
             except:
                 print traceback.print_exc()
                 pass
-    exit()
     return protein_ipr_db_domain
 
-def interproScan(subject_info, all_proteins,pfam_domains_file, email):
+def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing):
     '''Scans all the proteins in protein_list with InterproScan. Remove subjects from subject_info that have a domain that is now allowed (as given by user, e.g. transcription factor domains)
         or that don't have any IPR domains in comon with any of its query proteins.
         
@@ -91,7 +90,9 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
                     interpro_data = pickle.load( open(interpro_file, 'rb' ) )
                     protein_ipr_db_domain[protein_name] = interpro_data
                     print 'loaded interpro data from '+str(interpro_file)
-                except EOFError:
+                except EOFError as e:
+                    print(e)
+                    print('removing pickle file, blasting again')
                     # if file is not read correctly, remove it so that it is remade
                     os.remove(interpro_file)
         if not os.path.isfile(interpro_file):
@@ -102,7 +103,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
                 y = 0
                 while True:
                     try:
-                        interpro_data = interpro_result(interpro_submit_sequences,email)
+                        interpro_data = interpro_result(interpro_submit_sequences,email,developing)
                         break
                     except SOAPpy.Errors.HTTPError:
                         y+=1
@@ -115,9 +116,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
                         
                 protein_ipr_db_domain.update(interpro_data)
                 interpro_submit_sequences = []
-                f = open(interpro_file, 'wb' )
-                pickle.dump( interpro_data, f )
-                print 'written interpro data to '+str(interpro_file)
+
     # if for some reason not all of them were done
     if len(interpro_submit_sequences) > 0:
         interpro_data = interpro_result(interpro_submit_sequences, email)

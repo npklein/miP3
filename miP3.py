@@ -298,7 +298,7 @@ print('len subject_info_filtered_on_compared_length after filtering on comparati
 ###### try uncommenting this line and adding 'import pfam' at the top of the file (check out pfam.py before)
 #subject_info_filter_on_pfam = pfam.pfamSearch(subject_info_filtered_on_compared_length, all_proteins)
 ########################################################################################
-subject_info_filtered_on_domains = interpro_scanner.interproScan(subject_info_filtered_on_compared_length, all_proteins,pfam_domains_file_path, args['email'])  # filter on domain information gained from interproscan
+subject_info_filtered_on_domains = interpro_scanner.interproScan(subject_info_filtered_on_compared_length, all_proteins,pfam_domains_file_path, args['email'], developing)  # filter on domain information gained from interproscan
 if developing:
     for subject in subject_info_filtered_on_domains:
         for prot in not_found:
