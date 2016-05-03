@@ -119,7 +119,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
 
     # if for some reason not all of them were done
     if len(interpro_submit_sequences) > 0:
-        interpro_data = interpro_result(interpro_submit_sequences, email)
+        interpro_data = interpro_result(interpro_submit_sequences, email, developing)
         protein_ipr_db_domain.update(interpro_data)
 
 #### remove subjects with a pfam domain or IPR code that's not allowed and subjects that don't have any domains in common with their query protein(s)
