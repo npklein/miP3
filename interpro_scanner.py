@@ -23,7 +23,7 @@ import traceback
 import SOAPpy
 import time
 
-def interpro_result(interpro_submit_sequences, email, developing):
+def interpro_result(interpro_submit_sequences, email, developing, script_dir):
     protein_ipr_db_domain = {}
     # this is done per 25
     for protein_name, interpro_result in iprscan_soappy.runInterpro(interpro_submit_sequences, email):					# get dict with as value protein name and as value various stuff
@@ -40,16 +40,16 @@ def interpro_result(interpro_submit_sequences, email, developing):
         protein_ipr_db_domain[protein_name]['ipr_domain_names'] = ipr_domain_names
         if developing:
             try:
-                interpro_data = os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
-                f = open( interpro_data, 'wb' )
+                interpro_file = script_dir+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
+                f = open( interpro_file, 'wb' )
                 pickle.dump( protein_ipr_db_domain[protein_name], f )
-                print 'wrote interpro data to '+interpro_data
+                print 'wrote interpro data to '+interpro_file
             except:
                 print traceback.print_exc()
                 pass
     return protein_ipr_db_domain
 
-def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing):
+def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing, script_dir):
     '''Scans all the proteins in protein_list with InterproScan. Remove subjects from subject_info that have a domain that is now allowed (as given by user, e.g. transcription factor domains)
         or that don't have any IPR domains in comon with any of its query proteins.
         
@@ -83,7 +83,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
         protein_name = (fasta_sequence.split('\n')[0].lstrip('>'))					 # get the protein name
         if not os.path.exists('interpro_results'):
             os.makedirs('interpro_results')
-        interpro_file = os.path.dirname(os.path.abspath(__file__))+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
+        interpro_file = script_dir+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
         if developing:
             if os.path.isfile(interpro_file):
                 try:
@@ -103,7 +103,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
                 y = 0
                 while True:
                     try:
-                        interpro_data = interpro_result(interpro_submit_sequences,email,developing)
+                        interpro_data = interpro_result(interpro_submit_sequences,email,developing, script_dir)
                         break
                     except SOAPpy.Errors.HTTPError:
                         y+=1
