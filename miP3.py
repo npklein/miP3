@@ -143,9 +143,9 @@ if not os.path.exists(script_path+'fasta_files'):
     os.makedirs(script_path+'fasta_files')
 # proteins_500aa and small_proteins given twice, first to get ids, second to get
 # the proteins (see function)
-output.write_fasta(proteins_500aa, proteins_500aa, script_path+'fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta')
-output.write_fasta(small_proteins, small_proteins, script_path+'fasta_files'+os.sep+'small_proteins.fasta')
-output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fasta_files'+os.sep+'proteins_of_interest.fasta')
+output.write_fasta(proteins_500aa, proteins_500aa, script_path+'fasta_files'+os.sep+organism_name + '_all_proteins_smaller_than_500aa.fasta')
+output.write_fasta(small_proteins, small_proteins, script_path+'fasta_files'+os.sep+organism_name + 'small_proteins.fasta')
+output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fasta_files'+os.sep+organism_name+'_proteins_of_interest.fasta')
 
 if not os.path.exists(script_path+'databases'):
     os.makedirs(script_path+'databases')
@@ -162,7 +162,7 @@ if developing:
 ###### use if not instead of else incase the error above got thrown, and file got removed
 if not developing or not os.path.isfile(blast_all_pickle):
     print 'blasting against all'
-    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta', script_path+'databases'+os.sep+'allDB_'+organism_name, blast_folder)       # make all proteins database
+    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+organism_name + '_all_proteins_smaller_than_500aa.fasta', script_path+'databases'+os.sep+'allDB_'+organism_name, blast_folder)       # make all proteins database
     blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'allDB_'+organism_name, args['eval_all'], blast_folder, script_path+'blast_results/'+organism_name+'_blastpAllOutput.xml')
     subject_info_allDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_all'])
     if developing:
@@ -195,7 +195,7 @@ if developing:
             print('removing pickle file, blasting again')
             os.remove(blast_small_pickle)
 if not developing or not os.path.isfile(blast_small_pickle):
-    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'small_proteins.fasta', script_path+'databases'+os.sep+'smallDB_'+organism_name, blast_folder)       # make all proteins database
+    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+organism_name + 'small_proteins.fasta', script_path+'databases'+os.sep+'smallDB_'+organism_name, blast_folder)       # make all proteins database
     print 'blasting against small' 
     blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'smallDB_'+organism_name, args['eval_small'], blast_folder, script_path+'blast_results/'+organism_name+"_blastpSmallOutput.xml")
     subject_info_smallDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_small'])
@@ -233,7 +233,7 @@ if developing:
             os.remove(reblast_pickle)
 if not developing or not os.path.isfile(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'):
     print 'reblasting, saving in '+script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'
-    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'proteins_of_interest.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+organism_name, blast_folder)       # make all proteins database
+    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+organism_name+'_proteins_of_interest.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+organism_name, blast_folder)       # make all proteins database
     blast_records = blast.blastp(script_path+'fasta_files'+os.sep+'subjects_from_small.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+organism_name, args['eval_reblast'], blast_folder, script_path+'blast_results/'+organism_name+"_blastpReblastOutput.xml")   # BLAST against interest
     subject_info_smallDB_filtered_reblast = blast.subjectHitsInterest(blast_records, proteins_of_interest, args['eval_reblast'])             # Check if protein found in prev. BLAST is a TF, if so, keep the subject from first BLAST
     if developing:

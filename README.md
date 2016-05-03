@@ -82,7 +82,7 @@ And the optional arguments are:
     -x E-value to use when checking if reblasting the results from
        finding homologs of small proteins gives transcription factors as
        top results. 
-
+    -d Save and reuse BLAST and InterproData. If a run fails, using -d should make you start at last point of analysis. 
 
 All necessary files to run miP3.py to find microProteins in Arabidopsis are located in the miP3_version_2 folder except for the ncbi_blast_2.2.29+ BLAST folder. To search for miPs in Arabidopsis do: 
 
