@@ -140,7 +140,7 @@ for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
     if len(seq_record.seq)  <= int(args['all_size']):
         proteins_500aa[seq_record.description] = seq_record.seq
 
-
+organism_name = all_proteins_path.split(os.sep)[-1].split('.')[0]
 if not os.path.exists(script_path+'fasta_files'):
     os.makedirs(script_path+'fasta_files')
 # proteins_500aa and small_proteins given twice, first to get ids, second to get
@@ -152,7 +152,7 @@ output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fast
 if not os.path.exists(script_path+'databases'):
     os.makedirs(script_path+'databases')
 
-blast_all_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_all_'+str(args['eval_all'])+'.p'
+blast_all_pickle = script_path+'blast_results'+os.sep+organism_name+'_blast_all_'+str(args['eval_all'])+'.p'
 if developing:
     if os.path.isfile(blast_all_pickle):
         print 'BLAST records with this e-value against ALL database already exists, loading: '+blast_all_pickle
@@ -163,8 +163,8 @@ if developing:
 ###### use if not instead of else incase the error above got thrown, and file got removed
 if not developing or not os.path.isfile(blast_all_pickle):
     print 'blasting against all'
-    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta', script_path+'databases'+os.sep+'allDB_'+all_proteins_path.split(os.sep)[-1].split('.')[0], blast_folder)       # make all proteins database
-    blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'allDB_'+all_proteins_path.split(os.sep)[-1].split('.')[0], args['eval_all'], blast_folder)
+    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta', script_path+'databases'+os.sep+'allDB_'+organism_name, blast_folder)       # make all proteins database
+    blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'allDB_'+organism_name, args['eval_all'], blast_folder, script_path+'blast_results/'+organism_name+"_blastpAllOutput.xml")
     subject_info_allDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_all'])
     if developing:
         print 'saving in '+blast_all_pickle
@@ -185,7 +185,7 @@ print('len subject_info_allDB after < '+str(args['all_size'])+'a.a. Protein blas
 
 # small proteins. First BLAST against small proteins database so that the subject_info_all can be used to BLAST subjects against all proteins and check if hits  protein of interest
 # BLAST against small proteins
-blast_small_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_small_'+str(args['eval_small'])+'.p'
+blast_small_pickle = script_path+'blast_results'+os.sep+organism_name+'_blast_small_'+str(args['eval_small'])+'.p'
 if developing:
     if os.path.isfile(blast_small_pickle):
         print 'BLAST records with this e-value against SMALL database already exists, loading: '+blast_small_pickle
@@ -196,9 +196,9 @@ if developing:
             print('removing pickle file, blasting again')
             os.remove(blast_small_pickle)
 if not developing or not os.path.isfile(blast_small_pickle):
-    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'small_proteins.fasta', script_path+'databases'+os.sep+'smallDB_'+all_proteins_path.split(os.sep)[-1].split('.')[0], blast_folder)       # make all proteins database
+    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'small_proteins.fasta', script_path+'databases'+os.sep+'smallDB_'+organism_name, blast_folder)       # make all proteins database
     print 'blasting against small' 
-    blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'smallDB_'+all_proteins_path.split(os.sep)[-1].split('.')[0], args['eval_small'], blast_folder)
+    blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'smallDB_'+organism_name, args['eval_small'], blast_folder, script_path+'blast_results/'+organism_name+"_blastpSmallOutput.xml")
     subject_info_smallDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_small'])
     if developing:
         print 'saving in '+blast_small_pickle
@@ -224,7 +224,7 @@ if len(subject_info_smallDB) > 0:
 
 # check if, when subjects are blast against alldb, they have hit with protein of interest. If they do, they are put into subject_info_all
 # miPs that were known at that moment  (this might be redundant and takes extra time. Can possibly be taken out, but test if you get the same results
-reblast_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'reblast'+str(args['eval_all'])+'.p'
+reblast_pickle = script_path+'blast_results'+os.sep+organism_name+'reblast'+str(args['eval_all'])+'.p'
 if developing:
     if os.path.isfile(reblast_pickle):
         print 'BLAST records with this e-value against SMALL database and e-value for REBLAST against ALL database already exists, loading: '+reblast_pickle
@@ -234,8 +234,8 @@ if developing:
             os.remove(reblast_pickle)
 if not developing or not os.path.isfile(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'):
     print 'reblasting, saving in '+script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'
-    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'proteins_of_interest.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+all_proteins_path.split(os.sep)[-1].split('.')[0], blast_folder)       # make all proteins database
-    blast_records = blast.blastp(script_path+'fasta_files'+os.sep+'subjects_from_small.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+all_proteins_path.split(os.sep)[-1].split('.')[0], args['eval_reblast'], blast_folder)   # BLAST against interest
+    blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'proteins_of_interest.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+organism_name, blast_folder)       # make all proteins database
+    blast_records = blast.blastp(script_path+'fasta_files'+os.sep+'subjects_from_small.fasta', script_path+'databases'+os.sep+'allDB_for_reblast_'+organism_name, args['eval_reblast'], blast_folder, script_path+'blast_results/'+organism_name+"_blastpReblastOutput.xml")   # BLAST against interest
     subject_info_smallDB_filtered_reblast = blast.subjectHitsInterest(blast_records, proteins_of_interest, args['eval_reblast'])             # Check if protein found in prev. BLAST is a TF, if so, keep the subject from first BLAST
     if developing:
         f = open(reblast_pickle, 'wb' )

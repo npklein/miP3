@@ -53,7 +53,7 @@ def makeBLASTdb(fasta_file, database_name, blast_path):
     subprocess.call(['./makeblastdb', '-in',  fasta_file, '-dbtype', 'prot', '-out', database_name])
     return 
 
-def blastp(blast_file, blast_db, evalue, blast_path):
+def blastp(blast_file, blast_db, evalue, blast_path, blastoutput_xml):
     """
     Run a BLASTP search with blast_file against blast_db
     
@@ -62,6 +62,7 @@ def blastp(blast_file, blast_db, evalue, blast_path):
         blast_db (str):		  Name of the database to BLAST against 
         evalue (float):		  Evalue to use as threshold
         blast_path (str):	  Path to the blastp program
+        blastoutput_xml (str): location of the blast output xml file
     
     Returns:
         An iterable of blast records as returned by NCBIXML.parse
@@ -75,7 +76,7 @@ def blastp(blast_file, blast_db, evalue, blast_path):
     try:
         # try to run it with location of blast program
         blastp_cline = NcbiblastpCommandline(blast_path+'/blastp', query=blast_file, db=blast_db, evalue=evalue,
-                                                                      outfmt=5, out="blastpOutput.xml")
+                                                                      outfmt=5, out=blastoutput_xml)
         return cline(blastp_cline)
     except OSError as e:
         print(e)
@@ -86,7 +87,7 @@ def blastp(blast_file, blast_db, evalue, blast_path):
                                                                       outfmt=5, out="blastpOutput.xml")
     return cline(blastp_cline)
 
-def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
+def rpsblast(blast_file, rpsblast_db, blast_path, evalue, blastoutput_xml):
     """
     Run a rpsBLAST search with blast_file rpsblast_db
     
@@ -101,13 +102,13 @@ def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
     """
     def cline():
         rpsblast_cline(rpsblast_cline)
-        result_handle = open("rpsblastOutput.xml")
+        result_handle = open(blastoutput_xml)
         blast_records = NCBIXML.parse(result_handle)
         return blast_records
     
     try:
         # first try to run it with location of blast program
-        rpsblast_cline = NcbirpsblastCommandline(blast_path+'/rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
+        rpsblast_cline = NcbirpsblastCommandline(blast_path+'/rpsblast', query=blast_file, db=rpsblast_db, evalue=evalue,outfmt=5, out="rpsblastOutput.xml")
         return rpsblast_cline(rpsblast_cline)
     except OSError as e:
         print(e)
@@ -115,7 +116,7 @@ def rpsblast(blast_file, rpsblast_db, blast_path, evalue):
 
     # else, try to copy it to current folder and run it directly
     shutil.copy2(blast_path+'rpsblast','rpsblast')
-    rpsblast_cline = NcbirpsblastCommandline('rpsblast', query=blast_file, db=rpsblast_db, evalue=0.00000001,outfmt=5, out="rpsblastOutput.xml")
+    rpsblast_cline = NcbirpsblastCommandline('rpsblast', query=blast_file, db=rpsblast_db, evalue=evalue,outfmt=5, out="rpsblastOutput.xml")
     return rpsblast_cline(rpsblast_cline) 
 
 def getSubjectInfo(blast_records, prots_of_interest, evalue):
