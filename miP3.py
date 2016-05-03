@@ -31,6 +31,14 @@ import sys
 import re
 
 
+def fix_file_names(value):
+    """
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    """
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = re.sub('[-\s]+', '-', value)
+    return(value)
 
 def validate(seq):
     alphabets = re.compile('^[acdefghiklmnpqrstvwyx]*$', re.I)
@@ -151,7 +159,7 @@ if not os.path.exists(script_path+'databases'):
     os.makedirs(script_path+'databases')
 if not os.path.exists(script_path+'blast_results'):
     os.makedirs(script_path+'blast_results')
-blast_all_pickle = script_path+'blast_results'+os.sep+organism_name+'_blast_all_'+str(args['eval_all'])+'.p'
+blast_all_pickle = fix_file_names(script_path+'blast_results'+os.sep+organism_name+'_blast_all_'+str(args['eval_all'])+'.p')
 if developing:
     if os.path.isfile(blast_all_pickle):
         print 'BLAST records with this e-value against ALL database already exists, loading: '+blast_all_pickle
@@ -184,7 +192,7 @@ print('len subject_info_allDB after < '+str(args['all_size'])+'a.a. Protein blas
 
 # small proteins. First BLAST against small proteins database so that the subject_info_all can be used to BLAST subjects against all proteins and check if hits  protein of interest
 # BLAST against small proteins
-blast_small_pickle = script_path+'blast_results'+os.sep+organism_name+'_blast_small_'+str(args['eval_small'])+'.p'
+blast_small_pickle = fix_file_names(script_path+'blast_results'+os.sep+organism_name+'_blast_small_'+str(args['eval_small'])+'.p')
 if developing:
     if os.path.isfile(blast_small_pickle):
         print 'BLAST records with this e-value against SMALL database already exists, loading: '+blast_small_pickle
@@ -223,7 +231,7 @@ if len(subject_info_smallDB) > 0:
 
 # check if, when subjects are blast against alldb, they have hit with protein of interest. If they do, they are put into subject_info_all
 # miPs that were known at that moment  (this might be redundant and takes extra time. Can possibly be taken out, but test if you get the same results
-reblast_pickle = script_path+'blast_results'+os.sep+organism_name+'reblast'+str(args['eval_all'])+'.p'
+reblast_pickle = fix_file_names(script_path+'blast_results'+os.sep+organism_name+'reblast'+str(args['eval_all'])+'.p')
 if developing:
     if os.path.isfile(reblast_pickle):
         print 'BLAST records with this e-value against SMALL database and e-value for REBLAST against ALL database already exists, loading: '+reblast_pickle
@@ -303,4 +311,6 @@ if developing:
 output.write_result_out(subject_info_filtered_on_domains, outfile_path, all_proteins)
 
     
+
+
 

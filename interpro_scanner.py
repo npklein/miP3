@@ -23,6 +23,16 @@ import traceback
 import SOAPpy
 import time
 
+def fix_file_names(value):
+    """
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    """
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = re.sub('[-\s]+', '-', value)
+    return(value)
+
+
 def interpro_result(interpro_submit_sequences, email, developing, script_dir):
     protein_ipr_db_domain = {}
     # this is done per 25
@@ -62,6 +72,8 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
         Dict that is subject_info but filtered on subjects from subject_info that have a domain that is now allowed (as given by user, e.g. transcription factor domains)
         or that don't have any IPR domains in comon with any of its query proteins.
         '''
+    if not os.path.exists(script_dir+'interpro_results'):
+        os.makedirs(script_dir+'interpro_results')
     sequence_count = 0														  # sequence counter for status bar update
     fasta_sequences = set()													 # use set so no double sequence are scanned
     # get all the query proteins
@@ -81,9 +93,8 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
         x+=1
         sequence_count += 1
         protein_name = (fasta_sequence.split('\n')[0].lstrip('>'))					 # get the protein name
-        if not os.path.exists('interpro_results'):
-            os.makedirs('interpro_results')
-        interpro_file = script_dir+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
+
+        interpro_file = fix_file_names(script_dir+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p')
         if developing:
             if os.path.isfile(interpro_file):
                 try:
