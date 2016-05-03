@@ -196,7 +196,9 @@ if developing:
         print 'BLAST records with this e-value against SMALL database already exists, loading: '+blast_small_pickle
         try:
             subject_info_smallDB = pickle.load( open(blast_small_pickle, 'rb' ))
-        except EOFError:
+        except EOFError as e:
+            print(e)
+            print('removing pickle file, blasting again')
             os.remove(blast_small_pickle)
 if not developing or not os.path.isfile(blast_small_pickle):
     blast.makeBLASTdb('fasta_files'+os.sep+'small_proteins.fasta', 'databases'+os.sep+'smallDB', blast_folder)       # make all proteins database

@@ -47,7 +47,7 @@ def interpro_result(interpro_submit_sequences, email):
             except:
                 print traceback.print_exc()
                 pass
-    
+    exit()
     return protein_ipr_db_domain
 
 def interproScan(subject_info, all_proteins,pfam_domains_file, email):
@@ -99,18 +99,18 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email):
             protein_ipr_db_domain[protein_name] = {}									# keep the ipr codes and database name and domain name in this dict
             interpro_submit_sequences.append(fasta_sequence)
             if sequence_count % 25 == 0 or len(fasta_sequences) <= sequence_count-1:	  # divivide it up into chunks of 25
-                x = 0
+                y = 0
                 while True:
                     try:
                         interpro_data = interpro_result(interpro_submit_sequences,email)
                         break
                     except SOAPpy.Errors.HTTPError:
-                        x+=1
-                        if x == 100:
+                        y+=1
+                        if y == 100:
                             print('failed 100 times, something wrong with interpro server')
                             raise
                         print 'HTTPError, sleep 1 minute to give running jobs time to finish, then submitting same jobs again'
-                        print 'try '+str(x)+'/100'
+                        print 'try '+str(y)+'/100'
                         time.sleep(60)
                         
                 protein_ipr_db_domain.update(interpro_data)
