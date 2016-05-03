@@ -146,16 +146,16 @@ for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
         proteins_500aa[seq_record.description] = seq_record.seq
 
 
-if not os.path.exists('fasta_files'):
-    os.makedirs('fasta_files')
+if not os.path.exists(script_path+'fasta_files'):
+    os.makedirs(script_path+'fasta_files')
 # proteins_500aa and small_proteins given twice, first to get ids, second to get
 # the proteins (see function)
 output.write_fasta(proteins_500aa, proteins_500aa, script_path+'fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta')
 output.write_fasta(small_proteins, small_proteins, script_path+'fasta_files'+os.sep+'small_proteins.fasta')
 output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fasta_files'+os.sep+'proteins_of_interest.fasta')
 
-if not os.path.exists('databases'):
-    os.makedirs('databases')
+if not os.path.exists(script_path+'databases'):
+    os.makedirs(script_path+'databases')
 
 blast_all_pickle = script_path+'blast_results'+os.sep+all_proteins_path.split(os.sep)[-1].split('.')[0]+'_blast_all_'+str(args['eval_all'])+'.p'
 if developing:
