@@ -26,7 +26,6 @@ import blast
 import interpro_scanner
 import output
 from Bio import SeqIO
-from sys import platform as _platform
 import pickle
 import sys
 import re
@@ -132,7 +131,6 @@ for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
         print seq_record.description
         print seq
         sys.exit()
-    print(seq_record.description)
     all_proteins[seq_record.description] = seq
     proteins_of_interest[seq_record.description] = seq_record.seq
     if len(seq_record.seq) <= int(args['small_size']):
@@ -151,7 +149,8 @@ output.write_fasta(proteins_of_interest, proteins_of_interest, script_path+'fast
 
 if not os.path.exists(script_path+'databases'):
     os.makedirs(script_path+'databases')
-
+if not os.path.exists(script_path+'databases'):
+    os.makedirs(script_path+'blast_results')
 blast_all_pickle = script_path+'blast_results'+os.sep+organism_name+'_blast_all_'+str(args['eval_all'])+'.p'
 if developing:
     if os.path.isfile(blast_all_pickle):
@@ -164,7 +163,7 @@ if developing:
 if not developing or not os.path.isfile(blast_all_pickle):
     print 'blasting against all'
     blast.makeBLASTdb(script_path+'fasta_files'+os.sep+'all_proteins_smaller_than_500aa.fasta', script_path+'databases'+os.sep+'allDB_'+organism_name, blast_folder)       # make all proteins database
-    blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'allDB_'+organism_name, args['eval_all'], blast_folder, script_path+'blast_results/'+organism_name+"_blastpAllOutput.xml")
+    blast_records = blast.blastp(interest_proteins_path, script_path+'databases'+os.sep+'allDB_'+organism_name, args['eval_all'], blast_folder, script_path+'blast_results/'+organism_name+'_blastpAllOutput.xml')
     subject_info_allDB = blast.getSubjectInfo(blast_records, proteins_of_interest, args['eval_all'])
     if developing:
         print 'saving in '+blast_all_pickle
