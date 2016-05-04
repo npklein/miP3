@@ -90,8 +90,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
     protein_ipr_db_domain = {}
     # sort fasta sequences by length, as the 25 sequences wait until the last is finished this way they should be grouped
     # by similar runtimes, and the short ones will not be waiting on the long ones
-    fasta_sequences.sort(key = len)
-    for fasta_sequence in fasta_sequences:											 # loop over all the sequences
+    for fasta_sequence in sorted(fasta_sequences):											 # loop over all the sequences
         print(str(x)+'/'+str(len(fasta_sequences)))
         x+=1
         sequence_count += 1
