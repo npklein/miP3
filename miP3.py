@@ -165,7 +165,9 @@ if developing:
         print 'BLAST records with this e-value against ALL database already exists, loading: '+blast_all_pickle
         try:
             subject_info_allDB = pickle.load( open(blast_all_pickle, 'rb' ))
-        except EOFError:
+        except (EOFError, KeyError) as e:
+            repr(e)
+            print('Renoving pickle file, redoing blast')
             os.remove(blast_all_pickle)
 ###### use if not instead of else incase the error above got thrown, and file got removed
 if not developing or not os.path.isfile(blast_all_pickle):
@@ -198,9 +200,9 @@ if developing:
         print 'BLAST records with this e-value against SMALL database already exists, loading: '+blast_small_pickle
         try:
             subject_info_smallDB = pickle.load( open(blast_small_pickle, 'rb' ))
-        except EOFError as e:
-            print(e)
-            print('removing pickle file, blasting again')
+        except (EOFError, KeyError) as e:
+            repr(e)
+            print('Renoving pickle file, redoing blast')
             os.remove(blast_small_pickle)
 if not developing or not os.path.isfile(blast_small_pickle):
     blast.makeBLASTdb(script_path+'fasta_files'+os.sep+organism_name + 'small_proteins.fasta', script_path+'databases'+os.sep+'smallDB_'+organism_name, blast_folder)       # make all proteins database
@@ -237,7 +239,9 @@ if developing:
         print 'BLAST records with this e-value against SMALL database and e-value for REBLAST against ALL database already exists, loading: '+reblast_pickle
         try:
             subject_info_smallDB_filtered_reblast = pickle.load( open(reblast_pickle, 'rb' ))
-        except EOFError:
+        except (EOFError, KeyError) as e:
+            repr(e)
+            print('Renoving pickle file, redoing blast')
             os.remove(reblast_pickle)
 if not developing or not os.path.isfile(script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'):
     print 'reblasting, saving in '+script_path+'blast_results'+os.sep+'blast_small_blast_'+str(args['eval_small'])+'_reblast_'+str(args['eval_reblast'])+'.p'
