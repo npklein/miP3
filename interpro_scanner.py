@@ -28,8 +28,10 @@ def fix_file_names(value):
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    filename, file_extension = os.path.splitext(value)
+    value = unicode(re.sub('[^\w\s-]', '', filename).strip().lower())
     value = re.sub('[-\s]+', '-', value)
+    value += file_extension
     return(value)
 
 
@@ -50,7 +52,7 @@ def interpro_result(interpro_submit_sequences, email, developing, script_dir):
         protein_ipr_db_domain[protein_name]['ipr_domain_names'] = ipr_domain_names
         if developing:
             try:
-                interpro_file = script_dir+os.sep+fix_file_names('interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p')
+                interpro_file = script_dir+os.sep+'interpro_results'+os.sep+fix_file_names(protein_name.split('|')[0].strip()+'_interpro.p')
                 f = open( interpro_file, 'wb' )
                 pickle.dump( protein_ipr_db_domain[protein_name], f )
                 print 'wrote interpro data to '+interpro_file

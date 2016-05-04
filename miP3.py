@@ -36,8 +36,10 @@ def fix_file_names(value):
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    filename, file_extension = os.path.splitext(value)
+    value = unicode(re.sub('[^\w\s-]', '', filename).strip().lower())
     value = re.sub('[-\s]+', '-', value)
+    value += file_extension
     return(value)
 
 def validate(seq):
