@@ -112,7 +112,7 @@ script_path = os.path.realpath(__file__).rstrip(__file__.split('/')[-1])      # 
     '''
 proteins_of_interest = {}
 for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
-    proteins_of_interest[seq_record.description] = seq_record.seq
+    proteins_of_interest[' '.join(seq_record.description.split())] = seq_record.seq
 all_proteins = {}
 # smaller than args['small_size']+1
 small_proteins = {}
@@ -125,11 +125,11 @@ for seq_record in SeqIO.parse(all_proteins_path, 'fasta'):
         print seq_record.description
         print seq
         sys.exit()
-    all_proteins[seq_record.description] = seq
+    all_proteins[' '.join(seq_record.description.split())] = seq
     if len(seq_record.seq) <= int(args['small_size']):
-        small_proteins[seq_record.description] = seq
+        small_proteins[' '.join(seq_record.description.split())] = seq
     if len(seq_record.seq) <= int(args['all_size']):
-        proteins_500aa[seq_record.description] = seq
+        proteins_500aa[' '.join(seq_record.description.split())] = seq
 # also add the transcription factors because they can be from two different sources, so difference in title
 proteins_of_interest = {}
 for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
@@ -139,12 +139,12 @@ for seq_record in SeqIO.parse(interest_proteins_path, "fasta"):
         print seq_record.description
         print seq
         sys.exit()
-    all_proteins[seq_record.description] = seq
-    proteins_of_interest[seq_record.description] = seq_record.seq
+    all_proteins[' '.join(seq_record.description.split())] = seq
+    proteins_of_interest[' '.join(seq_record.description.split())] = seq_record.seq
     if len(seq_record.seq) <= int(args['small_size']):
-        small_proteins[seq_record.description] = seq_record.seq
+        small_proteins[' '.join(seq_record.description.split())] = seq_record.seq
     if len(seq_record.seq)  <= int(args['all_size']):
-        proteins_500aa[seq_record.description] = seq_record.seq
+        proteins_500aa[' '.join(seq_record.description.split())] = seq_record.seq
 
 organism_name = all_proteins_path.split(os.sep)[-1].split('.')[0]
 if not os.path.exists(script_path+'fasta_files'):
@@ -278,14 +278,14 @@ del(subject_info_smallDB)
 subject_info_filtered_on_compared_length = {}
 mip_longer = False
 for subject in subject_info_total:
-    for query in subject_info_total[subject]['query_title']:
-        query_length = len(all_proteins[query])
-        if all_proteins[subject] == all_proteins[query]:
+    for query in subject_info_total[' '.join(subject.split())]['query_title']:
+        query_length = len(all_proteins[' '.join(query.split())])
+        if all_proteins[' '.join(subject.split())] == all_proteins[' '.join(query).split()]:
             # skip if it is exact match with miP
             continue
         # don't add miP if it has no results beacuase of this
-        elif len(all_proteins[subject]) <  query_length + (float(query_length)/10):
-            subject_info_filtered_on_compared_length[subject] = subject_info_total[subject]
+        elif len(all_proteins[' '.join(subject.split())]) <  query_length + (float(query_length)/10):
+            subject_info_filtered_on_compared_length[' '.join(subject.split())] = subject_info_total[' '.join(subject.split())]
 if developing:
     for subject in subject_info_filtered_on_compared_length:
         for prot in not_found:

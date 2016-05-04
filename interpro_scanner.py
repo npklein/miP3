@@ -50,7 +50,7 @@ def interpro_result(interpro_submit_sequences, email, developing, script_dir):
         protein_ipr_db_domain[protein_name]['ipr_domain_names'] = ipr_domain_names
         if developing:
             try:
-                interpro_file = script_dir+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p'
+                interpro_file = script_dir+os.sep+fix_file_names('interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p')
                 f = open( interpro_file, 'wb' )
                 pickle.dump( protein_ipr_db_domain[protein_name], f )
                 print 'wrote interpro data to '+interpro_file
@@ -78,9 +78,9 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
     fasta_sequences = set()													 # use set so no double sequence are scanned
     # get all the query proteins
     for sequence in subject_info:
-        fasta_sequences.add('>'+sequence+'\n'+str(all_proteins[sequence]))			 # add fasta format string of all subject (found) proteins
+        fasta_sequences.add('>'+sequence+'\n'+str(all_proteins[' '.join(sequence.split())]))			 # add fasta format string of all subject (found) proteins
         for query in subject_info[sequence]['query_title']:
-            fasta_sequences.add('>'+query+'\n'+str(all_proteins[query]))			 # add fasta format string of all query (searched) proteins
+            fasta_sequences.add('>'+query+'\n'+str(all_proteins[' '.join(query.split())]))			 # add fasta format string of all query (searched) proteins
 
     interpro_submit_sequences = []	# submit 15 asynchronyous jobs from this list
     length_of_sequence_list = len(fasta_sequences)								 # needed to update the statusbar a little bit per sequence
@@ -88,13 +88,16 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
         print('Nothing found','No putative mip found, exiting program')								 # tell about the error
     x=1
     protein_ipr_db_domain = {}
+    # sort fasta sequences by length, as the 25 sequences wait until the last is finished this way they should be grouped
+    # by similar runtimes, and the short ones will not be waiting on the long ones
+    fasta_sequences.sort(key = len)
     for fasta_sequence in fasta_sequences:											 # loop over all the sequences
         print(str(x)+'/'+str(len(fasta_sequences)))
         x+=1
         sequence_count += 1
         protein_name = (fasta_sequence.split('\n')[0].lstrip('>'))					 # get the protein name
 
-        interpro_file = fix_file_names(script_dir+os.sep+'interpro_results'+os.sep+protein_name.split('|')[0].strip()+'_interpro.p')
+        interpro_file = script_dir+os.sep+'interpro_results'+os.sep+fix_file_names(protein_name.split('|')[0].strip()+'_interpro.p')
         if developing:
             if os.path.isfile(interpro_file):
                 try:
@@ -149,7 +152,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
             x = 0
             while True:
                 try:
-                    result = interpro_result(['>'+subject+'\n'+str(all_proteins[subject])])
+                    result = interpro_result(['>'+subject+'\n'+str(all_proteins[' '.join(subject.split())])])
                 except SOAPpy.Errors.HTTPError:
                     x+=1
                     if x == 100:
