@@ -280,7 +280,7 @@ mip_longer = False
 for subject in subject_info_total:
     for query in subject_info_total[' '.join(subject.split())]['query_title']:
         query_length = len(all_proteins[' '.join(query.split())])
-        if all_proteins[' '.join(subject.split())] == all_proteins[' '.join(query).split()]:
+        if all_proteins[' '.join(subject.split())] == all_proteins[' '.join(query.split())]:
             # skip if it is exact match with miP
             continue
         # don't add miP if it has no results beacuase of this
