@@ -31,19 +31,19 @@ niekdeklein@gmail.com
 
 Dependencies
 ------------
-Internet connection
-Python 2.7.x - obtainable from http://www.python.org/download/releases/2.7/ 
-Biopython - obtainable from http://biopython.org/wiki/Download 
-BLAST+ - obtainable from
-ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/. Version 2.2.29 is the version the program was tested with. For the latest version of BLAST go to ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/. 
-IMPORTANT: With version 2.2.31 the fasta titles can not contain more than 1 subsequent whitespace as BLAST will strip these and then they do not match anymore. 
-IMPORTANT: The BLAST+ program does not work when there are spaces in the filepath (e.g. if it is installed in C:\Program Files\ it will not work).
-SOAPpy - Read download instructions from http://www.aheil.de/2013/08/17/soap-with-python/
+Internet connection  
+Python 2.7.x - obtainable from http://www.python.org/download/releases/2.7/  
+Biopython - obtainable from http://biopython.org/wiki/Download  
+BLAST+ - obtainable from  
+ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/. Version 2.2.29 is the version the program was tested with. For the latest version of BLAST go to ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/.  
+IMPORTANT: With version 2.2.31 the fasta titles can not contain more than 1 subsequent whitespace as BLAST will strip these and then they do not match anymore.  
+IMPORTANT: The BLAST+ program does not work when there are spaces in the filepath (e.g. if it is installed in C:\Program Files\ it will not work).  
+SOAPpy - Read download instructions from http://www.aheil.de/2013/08/17/soap-with-python/  
 
 
 System requirements and runtime
 -------------------------------
-miP3.py runs on all operating systems with the Dependencies installed.
+miP3.py runs on all operating systems with the Dependencies installed.  
 Running miP3.py with all transcription factors of Arabidopsis thaliana (2296 proteins) against the complete proteome of Arabidopsis thaliana found in TAIR (35386 proteins) using BLAST 2.2.29+ on a 64-bit Windows 7 Enerprise with Intel Core i5-3570 CPU @ 3.40GHz with 8 GB of RAM takes 5 hours and 18 minutes. 
 
 
