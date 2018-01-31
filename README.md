@@ -1,11 +1,13 @@
 miP3.py Version 2
 =================
 
-This is an updated version of miP3.py at https://dpb.carnegiescience.edu/labs/rhee-lab/software. 
+Predict miPs and their target TFs from a sequenced genome.
 
 Example to run
 --------------
-After installing the dependencies (see below) an example can be run with (change the values between <> to your own data:
+Download the newest release from https://github.com/npklein/miP3/releases
+
+After installing the dependencies (see below) an example can be run with (change the values between <> to your own data):
 
 	python2.7 miP3.py -p exampleData/TAIR10_pep_20101214_subset -i exampleData/example_tfs.fasta -f exampleData/Pfam.txt -o 
 exampleData/test.tsv -b </path/to/blast/dir/bin/> -s 200 -a 550 -e 0.01 -z 0.5 -x 1 -m <your email>
