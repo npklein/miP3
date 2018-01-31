@@ -40,7 +40,7 @@ ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/. Version 2.2.29 is t
 IMPORTANT: With version 2.2.31 the fasta titles can not contain more than 1 subsequent whitespace as BLAST will strip these and then they do not match anymore.  
 IMPORTANT: The BLAST+ program does not work when there are spaces in the filepath (e.g. if it is installed in C:\Program Files\ it will not work).  
 SOAPpy - Read download instructions from http://www.aheil.de/2013/08/17/soap-with-python/  
-
+WSDL tools 0.4.3 - Newer version does not work! Install with: pip install -Iv wstools==0.4.3
 
 System requirements and runtime
 -------------------------------
