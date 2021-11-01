@@ -39,6 +39,8 @@ def interpro_result(interpro_submit_sequences, email, developing, script_dir):
     protein_ipr_db_domain = {}
     # this is done per 25
     for protein_name, interpro_result in iprscan_soappy.runInterpro(interpro_submit_sequences, email):					# get dict with as value protein name and as value various stuff
+        if not protein_name:
+            continue
         ipr_domain_names = []
         protein_ipr_db_domain[protein_name] = {}
 
@@ -93,6 +95,7 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
     # sort fasta sequences by length, as the 25 sequences wait until the last is finished this way they should be grouped
     # by similar runtimes, and the short ones will not be waiting on the long ones
     for fasta_sequence in sorted(fasta_sequences):											 # loop over all the sequences
+        print(fasta_sequence)
         print(str(x)+'/'+str(len(fasta_sequences)))
         x+=1
         sequence_count += 1
@@ -166,6 +169,9 @@ def interproScan(subject_info, all_proteins,pfam_domains_file, email, developing
 #                print subject, 'could not be processed'
 #                continue
         ipr_names = [i for i in protein_ipr_db_domain[subject].keys() if i != 'ipr_domain_names']
+        if subject not in protein_ipr_db_domain:
+            print('domain search for',subject,'did not work, skip')
+            continue
         domains = protein_ipr_db_domain[subject]['ipr_domain_names'] + ipr_names
 #        if 'AT1G72416.3' in subject:
 #            print 'SUBJECT:',subject

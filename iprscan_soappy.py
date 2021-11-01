@@ -234,10 +234,16 @@ class InterproScan():
             sys.stderr.write('Error: unrecognised argument combination\n')
     
     def getSequenceNameForJobID(self,jobid):
-        return(self.sequence_name_for_job_id[jobid])
+        if jobid in self.sequence_name_for_job_id:
+            return(self.sequence_name_for_job_id[jobid])
+        else:
+            print('jobid '+jobid+' not found')
     
     def getFastaSequenceForJobID(self, jobid):
-        return(self.sequence_for_job[jobid])
+        if jobid in self.sequence_for_job:
+            return(self.sequence_for_job[jobid])
+        else:
+            return None
     
     def getJobIDs(self):
         return self.jobid_list
@@ -282,11 +288,14 @@ class InterproScan():
     def serviceCheckStatus(self, jobId):
         self.printDebugMessage('serviceCheckStatus', 'jobId: ' + jobId, 1)
         try:
-            result = self.server.getStatus(jobId = jobId)
+            try:
+                result = self.server.getStatus(jobId = jobId)
+            except:
+                print('sleeping 30 seconds before checking status again...')
+                time.sleep(30)
+                result = self.server.getStatus(jobId = jobId)
         except:
-            print('sleeping 30 seconds before checking status again...')
-            time.sleep(30)
-            result = self.server.getStatus(jobId = jobId)
+            result = None
         return result
 
     # Get available result types for job
@@ -419,8 +428,14 @@ def runInterpro(sequence_list, email):
                 sys.stderr.write(str(e)+'\n')
                 sys.stderr.write('waiting 1 sec, trying again\n')
                 time.sleep(1)
+                seq = interproscan.getFastaSequenceForJobID(jobid)
+                if not seq:
+                    result = None
+                    break
                 interproscan = InterproScan(sequences = interproscan.getFastaSequenceForJobID(jobid), email='spam@gmail.com',  # run interpro scan with one sequence (has to be fasta format). Don't
                                                                verbose = True, write_outfiles = False, quiet = False, debugLevel = 1)
+        if not result:
+            continue
         interpro_result = {}
         for domain_info in result.split('\n'):
             domain_info = domain_info.split('\t')
